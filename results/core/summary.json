@@ -1,0 +1,12 @@
+{
+  "detector": "yolo26m",
+  "models_compared": [
+    "yolo26m",
+    "yolo11m",
+    "yolov8m"
+  ],
+  "records_off": "<project root>\\results\\core\\records\\yolo26m_off.jsonl",
+  "records_on": "<project root>\\results\\core\\records\\yolo26m_on.jsonl",
+  "minutes": 32.2,
+  "limit": null
+}

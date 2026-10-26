@@ -1,0 +1,46 @@
+# --- Python environments and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Datasets (live outside repository to respect licensing & size)
+DAWN/
+bdd100k/
+bdd100k-10k/
+gtFine_trainvaltest/
+gt_detection_trainval/
+leftImg8bit_trainval_foggyDBF/
+leftImg8bit_trainval_rain/
+leftImg8bit_trainvaltest/
+rgb_anon_trainvaltest_ACDC/
+
+# --- Regenerated weights & run-time outputs
+weights/
+results/*/cache/
+results/core/records/
+results/core/.stop_app
+results/core/run_*
+results/core/log_*.txt
+results/core/test*
+results/core/demo*
+results/core/*_out.mp4
+results/core/*_out.csv
+results/core/log_app.txt
+
+# Preserve sample demonstration files for repository visitors
+!results/core/sample_output.mp4
+!results/core/sample_output.csv
+
+# --- In-progress academic paper, draft report & internal viva notes (kept local)
+docs/
+tidy_for_github.py
+
+# --- OS / IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

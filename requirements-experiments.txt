@@ -1,0 +1,6 @@
+# Only for re-running the experiments / retraining the weather model (needs the datasets, see README).
+-r requirements.txt
+imagecorruptions==1.1.2      # synthetic fog / frost / motion-blur severity sweep
+open_clip_torch==3.3.0       # CLIP zero-shot baseline
+transformers==5.17.0         # Depth Anything V2, used offline to render fog for training data
+psutil==7.2.2                # memory-aware loader sizing and the benchmark

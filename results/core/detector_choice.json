@@ -1,0 +1,30 @@
+{
+  "detector": "yolo26m",
+  "rule": "adverse person recall, precision within 0.05 of best, tie -> smallest clear-to-adverse drop",
+  "summary": [
+    {
+      "model": "yolo26m",
+      "adverse_person_recall": 0.4426140263426716,
+      "adverse_precision": 0.687795135702805,
+      "adverse_map50": 0.40923528588262437,
+      "clear_person_recall": 0.47684024179156304,
+      "drop_clear_to_adverse": 0.03422621544889143
+    },
+    {
+      "model": "yolo11m",
+      "adverse_person_recall": 0.4085076128158687,
+      "adverse_precision": 0.7137107957878589,
+      "adverse_map50": 0.3851558601272001,
+      "clear_person_recall": 0.445665812842447,
+      "drop_clear_to_adverse": 0.03715820002657827
+    },
+    {
+      "model": "yolov8m",
+      "adverse_person_recall": 0.41294488149036346,
+      "adverse_precision": 0.6806280372325539,
+      "adverse_map50": 0.3794954944153991,
+      "clear_person_recall": 0.45877299910679603,
+      "drop_clear_to_adverse": 0.04582811761643257
+    }
+  ]
+}

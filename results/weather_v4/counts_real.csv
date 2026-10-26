@@ -1,0 +1,17 @@
+source,split,clear,fog,night,rain,snow,total
+acdc,test,2000,500,500,500,500,4000
+acdc,train,1600,400,400,400,400,3200
+acdc,val,406,100,106,100,100,812
+bdd,test,3441,5,3929,396,422,8193
+bdd,train,23042,43,26612,2411,2714,54822
+bdd,val,1225,5,1359,111,148,2848
+clean_cs,test,500,0,0,0,0,500
+clean_cs,train,2724,0,0,0,0,2724
+clean_cs,val,251,0,0,0,0,251
+dawn,test,0,300,0,200,204,704
+foggy_cs,test,0,1500,0,0,0,1500
+foggy_cs,train,0,8172,0,0,0,8172
+foggy_cs,val,0,753,0,0,0,753
+rain_cs,test,0,0,0,1188,0,1188
+rain_cs,train,0,0,0,7272,0,7272
+rain_cs,val,0,0,0,2160,0,2160

@@ -1,0 +1,10 @@
+,v1,v2_no_clean,v2
+acdc_test_accuracy,0.9878,0.9865,0.9895
+acdc_test_macro_f1,0.9845,0.9830,0.9860
+foggy_cs_test_beta_0.005_called_fog,0.0200,1.0000,0.9920
+foggy_cs_test_beta_0.01_called_fog,0.0680,1.0000,1.0000
+foggy_cs_test_beta_0.02_called_fog,0.2060,1.0000,1.0000
+rain_cs_test_alpha_0.01_beta_0.005_dropsize_0.01_called_rain,0.0051,1.0000,1.0000
+rain_cs_test_alpha_0.02_beta_0.01_dropsize_0.005_called_rain,0.0000,1.0000,1.0000
+rain_cs_test_alpha_0.03_beta_0.015_dropsize_0.002_called_rain,0.0025,1.0000,1.0000
+clean_cs_test_called_clear,0.9940,0.0340,0.9980

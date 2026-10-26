@@ -1,0 +1,55 @@
+PolyForm Noncommercial License 1.0.0
+https://polyformproject.org/licenses/noncommercial/1.0.0/
+
+Copyright (c) 2026 Syed Arsalan
+
+================================================================================
+TERMS AND CONDITIONS
+================================================================================
+
+1. Grant of License
+The licensor grants you a copyright license to use, copy, modify, distribute, 
+and create derivative works of this software, for Noncommercial Purposes only.
+
+2. Noncommercial Purposes
+A purpose is a Noncommercial Purpose only if:
+(a) You do not receive or expect to receive any commercial advantage, monetary 
+    compensation, or other financial remuneration in exchange for your use, 
+    distribution, or creation of derivative works.
+(b) You do not incorporate the software into a commercial product, SaaS offering, 
+    enterprise deployment, or proprietary perception system.
+
+Permitted noncommercial purposes include academic research, educational study, 
+personal evaluation, reproducibility benchmarking, and recruitment/portfolio 
+review by prospective employers.
+
+3. Citation & Academic Attribution Requirement
+This software embodies research and methodology that is currently being prepared 
+for formal academic publication. If you use this software, its findings, or the 
+underlying architecture for any academic, scientific, or benchmarking work, 
+you MUST cite the author and repository in any resulting paper, technical report, 
+or presentation as specified in the README.md citation notice.
+
+4. Intellectual Property & Patents
+No patent license is granted, either expressly or by implication. The author 
+reserves all intellectual property, commercialization, and patent rights.
+
+5. Notices
+You must retain all copyright notices, license conditions, and disclaimers 
+contained in this software in all copies and substantial portions thereof.
+
+6. Commercial Inquiries & Dual Licensing
+For commercial use, enterprise deployment, proprietary integration, or inquiries 
+regarding commercial licensing, please contact the author directly:
+Syed Arsalan (via GitHub profile contact).
+
+================================================================================
+DISCLAIMER
+================================================================================
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

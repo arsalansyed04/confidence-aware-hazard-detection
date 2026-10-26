@@ -1,0 +1,29 @@
+{
+  "best_config": "dinov2_last2",
+  "summary": [
+    {
+      "config": "dinov2_last2",
+      "cond_accuracy": 0.9391123880569349,
+      "cond_macro_f1": 0.7387131520668199,
+      "fog_level_bal_acc": 0.7954004747544102,
+      "rain_level_bal_acc": 0.8588527914736988,
+      "selection": 0.7740785444857137
+    },
+    {
+      "config": "dinov2_last4",
+      "cond_accuracy": 0.9358455343784429,
+      "cond_macro_f1": 0.7287970908399433,
+      "fog_level_bal_acc": 0.7812782312441446,
+      "rain_level_bal_acc": 0.863405030610894,
+      "selection": 0.7662149068749737
+    },
+    {
+      "config": "convnext_full",
+      "cond_accuracy": 0.9081161150032392,
+      "cond_macro_f1": 0.654617194609458,
+      "fog_level_bal_acc": 0.824450342306383,
+      "rain_level_bal_acc": 0.8642429290921422,
+      "selection": 0.7305089710453799
+    }
+  ]
+}

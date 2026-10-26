@@ -1,0 +1,14 @@
+stratum,frames,boxes,persons
+bdd_train_clear,3000,48783,4649
+bdd_val_clear,1500,24556,2354
+bdd_val_night,1500,19637,1084
+bdd_val_rain,396,6061,565
+bdd_val_snow,422,6596,708
+acdc_fog,500,2890,273
+acdc_night,506,3250,983
+acdc_rain,500,2666,400
+acdc_snow,500,3498,792
+cs_clear,800,13735,5141
+cs_fog_light,800,13735,5141
+cs_fog_medium,800,13735,5141
+cs_fog_dense,800,13735,5141

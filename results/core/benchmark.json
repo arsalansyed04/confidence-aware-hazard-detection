@@ -1,0 +1,29 @@
+{
+  "frames": 300,
+  "resolution": "1280x720",
+  "detector": "yolo26m",
+  "enhancement": true,
+  "dino": true,
+  "trust_model": true,
+  "weather_every": 5,
+  "flip_every": 2,
+  "fps_sustained": 20.58874547109751,
+  "latency_ms": {
+    "mean": 48.56787733200084,
+    "p50": 47.33859997941181,
+    "p95": 71.41523498576134,
+    "p99": 80.65724799846063,
+    "max": 93.1923000025563
+  },
+  "stage_mean_ms": {
+    "weather": 3.927599666349124,
+    "enhance": 3.654795667292395,
+    "detect": 18.19153233276059,
+    "trust_danger": 22.73611633242884
+  },
+  "rss_mb_start": 2739.2109375,
+  "rss_mb_end": 2739.6640625,
+  "rss_growth_mb": 0.453125,
+  "gpu_peak_mb": 438.6279296875,
+  "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU"
+}

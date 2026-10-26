@@ -1,0 +1,2331 @@
+{
+  "model": "ensemble of convnext_full + dinov2_last2",
+  "checkpoints": [
+    "<project root>\\results\\weather_v4\\ckpt_convnext_full.pt",
+    "<project root>\\results\\weather_v4\\ckpt_dinov2_last2.pt"
+  ],
+  "tta": true,
+  "per_source": {
+    "val": {
+      "acdc": {
+        "n": 812,
+        "accuracy": 0.9987684729064039,
+        "macro_f1": 0.99799994999875,
+        "per_class": {
+          "clear": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 406
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 100
+          },
+          "night": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 106
+          },
+          "rain": {
+            "precision": 0.9900990099009901,
+            "recall": 1.0,
+            "f1": 0.9950248756218906,
+            "support": 100
+          },
+          "snow": {
+            "precision": 1.0,
+            "recall": 0.99,
+            "f1": 0.9949748743718593,
+            "support": 100
+          }
+        },
+        "pred_distribution": {
+          "clear": 406,
+          "fog": 100,
+          "night": 106,
+          "rain": 101,
+          "snow": 99
+        },
+        "confusion_matrix": [
+          [
+            406,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            100,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            106,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            100,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            99
+          ]
+        ]
+      },
+      "acdc_rfog": {
+        "n": 406,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 406
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 406,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            406,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "acdc_rrain": {
+        "n": 406,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 406
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 0,
+          "night": 0,
+          "rain": 406,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            406,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "bdd": {
+        "n": 2848,
+        "accuracy": 0.9575140449438202,
+        "macro_f1": 0.7629821861939222,
+        "per_class": {
+          "clear": {
+            "precision": 0.9614121510673235,
+            "recall": 0.9559183673469388,
+            "f1": 0.9586573884568154,
+            "support": 1225
+          },
+          "fog": {
+            "precision": 0.2222222222222222,
+            "recall": 0.4,
+            "f1": 0.2857142857142857,
+            "support": 5
+          },
+          "night": {
+            "precision": 0.991899852724595,
+            "recall": 0.9911699779249448,
+            "f1": 0.9915347810084653,
+            "support": 1359
+          },
+          "rain": {
+            "precision": 0.7777777777777778,
+            "recall": 0.7567567567567568,
+            "f1": 0.7671232876712328,
+            "support": 111
+          },
+          "snow": {
+            "precision": 0.7935483870967742,
+            "recall": 0.831081081081081,
+            "f1": 0.8118811881188119,
+            "support": 148
+          }
+        },
+        "pred_distribution": {
+          "clear": 1218,
+          "fog": 9,
+          "night": 1358,
+          "rain": 108,
+          "snow": 155
+        },
+        "confusion_matrix": [
+          [
+            1171,
+            2,
+            10,
+            18,
+            24
+          ],
+          [
+            3,
+            2,
+            0,
+            0,
+            0
+          ],
+          [
+            8,
+            1,
+            1347,
+            2,
+            1
+          ],
+          [
+            15,
+            4,
+            1,
+            84,
+            7
+          ],
+          [
+            21,
+            0,
+            0,
+            4,
+            123
+          ]
+        ]
+      },
+      "bdd_rfog": {
+        "n": 600,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 600
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 600,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            600,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "bdd_rrain": {
+        "n": 600,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 600
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 0,
+          "night": 0,
+          "rain": 600,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            600,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "clean_cs": {
+        "n": 251,
+        "accuracy": 0.9960159362549801,
+        "macro_f1": 0.499001996007984,
+        "per_class": {
+          "clear": {
+            "precision": 1.0,
+            "recall": 0.9960159362549801,
+            "f1": 0.998003992015968,
+            "support": 251
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 250,
+          "fog": 1,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            250,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "clean_cs_rfog": {
+        "n": 251,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 251
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 251,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            251,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "clean_cs_rrain": {
+        "n": 251,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 251
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 0,
+          "night": 0,
+          "rain": 251,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            251,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "foggy_cs": {
+        "n": 753,
+        "accuracy": 0.9946879150066401,
+        "macro_f1": 0.4986684420772304,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 0.9946879150066401,
+            "f1": 0.9973368841544608,
+            "support": 753
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 4,
+          "fog": 749,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            749,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "rain_cs": {
+        "n": 2160,
+        "accuracy": 0.9986111111111111,
+        "macro_f1": 0.4996525364836692,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 0.9986111111111111,
+            "f1": 0.9993050729673384,
+            "support": 2160
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 3,
+          "night": 0,
+          "rain": 2157,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            2157,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    "test": {
+      "acdc": {
+        "n": 4000,
+        "accuracy": 0.99725,
+        "macro_f1": 0.9968112959081401,
+        "per_class": {
+          "clear": {
+            "precision": 0.9994984954864594,
+            "recall": 0.9965,
+            "f1": 0.9979969954932398,
+            "support": 2000
+          },
+          "fog": {
+            "precision": 0.984251968503937,
+            "recall": 1.0,
+            "f1": 0.9920634920634921,
+            "support": 500
+          },
+          "night": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 500
+          },
+          "rain": {
+            "precision": 0.996,
+            "recall": 0.996,
+            "f1": 0.996,
+            "support": 500
+          },
+          "snow": {
+            "precision": 1.0,
+            "recall": 0.996,
+            "f1": 0.9979959919839679,
+            "support": 500
+          }
+        },
+        "pred_distribution": {
+          "clear": 1994,
+          "fog": 508,
+          "night": 500,
+          "rain": 500,
+          "snow": 498
+        },
+        "confusion_matrix": [
+          [
+            1993,
+            7,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            500,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            500,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            498,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            2,
+            498
+          ]
+        ]
+      },
+      "acdc_rfog": {
+        "n": 600,
+        "accuracy": 0.9983333333333333,
+        "macro_f1": 0.49958298582151794,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 0.9983333333333333,
+            "f1": 0.9991659716430359,
+            "support": 600
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 599,
+          "night": 0,
+          "rain": 0,
+          "snow": 1
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            599,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "acdc_rrain": {
+        "n": 600,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 600
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 0,
+          "night": 0,
+          "rain": 600,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            600,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "bdd": {
+        "n": 8193,
+        "accuracy": 0.9632613206395704,
+        "macro_f1": 0.7899869390434985,
+        "per_class": {
+          "clear": {
+            "precision": 0.9604389257868899,
+            "recall": 0.966579482708515,
+            "f1": 0.9634994206257242,
+            "support": 3441
+          },
+          "fog": {
+            "precision": 0.2857142857142857,
+            "recall": 0.4,
+            "f1": 0.3333333333333333,
+            "support": 5
+          },
+          "night": {
+            "precision": 0.9876074860900355,
+            "recall": 0.9938915754644948,
+            "f1": 0.9907395661550171,
+            "support": 3929
+          },
+          "rain": {
+            "precision": 0.8846153846153846,
+            "recall": 0.8131313131313131,
+            "f1": 0.8473684210526315,
+            "support": 396
+          },
+          "snow": {
+            "precision": 0.8320987654320988,
+            "recall": 0.7985781990521327,
+            "f1": 0.814993954050786,
+            "support": 422
+          }
+        },
+        "pred_distribution": {
+          "clear": 3463,
+          "fog": 7,
+          "night": 3954,
+          "rain": 364,
+          "snow": 405
+        },
+        "confusion_matrix": [
+          [
+            3326,
+            4,
+            35,
+            27,
+            49
+          ],
+          [
+            2,
+            2,
+            0,
+            1,
+            0
+          ],
+          [
+            18,
+            0,
+            3905,
+            1,
+            5
+          ],
+          [
+            54,
+            1,
+            5,
+            322,
+            14
+          ],
+          [
+            63,
+            0,
+            9,
+            13,
+            337
+          ]
+        ]
+      },
+      "bdd_rfog": {
+        "n": 600,
+        "accuracy": 0.9983333333333333,
+        "macro_f1": 0.49958298582151794,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 0.9983333333333333,
+            "f1": 0.9991659716430359,
+            "support": 600
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 599,
+          "night": 1,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            599,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "bdd_rrain": {
+        "n": 600,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 600
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 0,
+          "night": 0,
+          "rain": 600,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            600,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "clean_cs": {
+        "n": 500,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 500
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 500,
+          "fog": 0,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            500,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "clean_cs_rfog": {
+        "n": 500,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 500
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 500,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            500,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "clean_cs_rrain": {
+        "n": 500,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 500
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 0,
+          "night": 0,
+          "rain": 500,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            500,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "dawn": {
+        "n": 704,
+        "accuracy": 0.7428977272727273,
+        "macro_f1": 0.4475833501490357,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.6526806526806527,
+            "recall": 0.9333333333333333,
+            "f1": 0.7681755829903978,
+            "support": 300
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.911504424778761,
+            "recall": 0.515,
+            "f1": 0.65814696485623,
+            "support": 200
+          },
+          "snow": {
+            "precision": 0.9929078014184397,
+            "recall": 0.6862745098039216,
+            "f1": 0.8115942028985508,
+            "support": 204
+          }
+        },
+        "pred_distribution": {
+          "clear": 4,
+          "fog": 429,
+          "night": 17,
+          "rain": 113,
+          "snow": 141
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            280,
+            10,
+            9,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            3,
+            87,
+            6,
+            103,
+            1
+          ],
+          [
+            0,
+            62,
+            1,
+            1,
+            140
+          ]
+        ]
+      },
+      "foggy_cs": {
+        "n": 1500,
+        "accuracy": 0.9973333333333333,
+        "macro_f1": 0.4993324432576769,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 1.0,
+            "recall": 0.9973333333333333,
+            "f1": 0.9986648865153538,
+            "support": 1500
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 4,
+          "fog": 1496,
+          "night": 0,
+          "rain": 0,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            1496,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "rain_cs": {
+        "n": 1188,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_class": {
+          "clear": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "fog": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "night": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "rain": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1188
+          },
+          "snow": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "pred_distribution": {
+          "clear": 0,
+          "fog": 0,
+          "night": 0,
+          "rain": 1188,
+          "snow": 0
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1188,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    }
+  },
+  "fog_level": {
+    "cityscapes_real_dbf_test_cities": {
+      "n": 2000,
+      "accuracy": 0.9785,
+      "balanced_accuracy": 0.9784999999999999,
+      "within_one_level": 0.999,
+      "per_level_recall": {
+        "none": 1.0,
+        "light": 0.978,
+        "medium": 0.968,
+        "dense": 0.968
+      },
+      "confusion_matrix": [
+        [
+          500,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          489,
+          8,
+          0
+        ],
+        [
+          1,
+          14,
+          484,
+          1
+        ],
+        [
+          0,
+          1,
+          15,
+          484
+        ]
+      ]
+    },
+    "rendered_on_acdc": {
+      "n": 600,
+      "accuracy": 0.9916666666666667,
+      "balanced_accuracy": 0.9918771785680284,
+      "within_one_level": 1.0,
+      "per_level_recall": {
+        "light": 0.986046511627907,
+        "medium": 0.994535519125683,
+        "dense": 0.995049504950495
+      },
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          212,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          182,
+          1
+        ],
+        [
+          0,
+          0,
+          1,
+          201
+        ]
+      ]
+    },
+    "rendered_on_bdd": {
+      "n": 600,
+      "accuracy": 0.9733333333333334,
+      "balanced_accuracy": 0.9733503665546218,
+      "within_one_level": 1.0,
+      "per_level_recall": {
+        "light": 0.9396984924623115,
+        "medium": 0.9855072463768116,
+        "dense": 0.9948453608247423
+      },
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          187,
+          11,
+          0
+        ],
+        [
+          0,
+          0,
+          204,
+          3
+        ],
+        [
+          0,
+          0,
+          1,
+          193
+        ]
+      ]
+    },
+    "rendered_on_clean_cs": {
+      "n": 500,
+      "accuracy": 0.938,
+      "balanced_accuracy": 0.9393255274100151,
+      "within_one_level": 1.0,
+      "per_level_recall": {
+        "light": 0.8659217877094972,
+        "medium": 0.952054794520548,
+        "dense": 1.0
+      },
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          155,
+          24,
+          0
+        ],
+        [
+          0,
+          0,
+          139,
+          7
+        ],
+        [
+          0,
+          0,
+          0,
+          175
+        ]
+      ]
+    }
+  },
+  "rain_level": {
+    "cityscapes_raincityscapes_test_cities": {
+      "n": 3188,
+      "accuracy": 0.9940401505646174,
+      "balanced_accuracy": 0.9880050505050505,
+      "within_one_level": 1.0,
+      "per_level_recall": {
+        "none": 1.0,
+        "light": 1.0,
+        "medium": 0.9823232323232324,
+        "heavy": 0.9696969696969697
+      },
+      "confusion_matrix": [
+        [
+          2000,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          396,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          389,
+          7
+        ],
+        [
+          0,
+          0,
+          12,
+          384
+        ]
+      ]
+    },
+    "rendered_on_acdc": {
+      "n": 600,
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "within_one_level": 1.0,
+      "per_level_recall": {
+        "light": 1.0,
+        "medium": 1.0,
+        "heavy": 1.0
+      },
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          195,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          218,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          187
+        ]
+      ]
+    },
+    "rendered_on_bdd": {
+      "n": 600,
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "within_one_level": 1.0,
+      "per_level_recall": {
+        "light": 1.0,
+        "medium": 1.0,
+        "heavy": 1.0
+      },
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          185,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          218,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          197
+        ]
+      ]
+    },
+    "rendered_on_clean_cs": {
+      "n": 500,
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "within_one_level": 1.0,
+      "per_level_recall": {
+        "light": 1.0,
+        "medium": 1.0,
+        "heavy": 1.0
+      },
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          177,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          170,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          153
+        ]
+      ]
+    }
+  },
+  "real_weather_level_distribution_no_ground_truth": {
+    "acdc_real_fog_predicted_fog_level": {
+      "none": 3,
+      "light": 129,
+      "medium": 343,
+      "dense": 25
+    },
+    "bdd_real_fog_predicted_fog_level": {
+      "none": 3,
+      "light": 2,
+      "medium": 0,
+      "dense": 0
+    },
+    "dawn_real_fog_predicted_fog_level": {
+      "none": 18,
+      "light": 14,
+      "medium": 34,
+      "dense": 234
+    },
+    "acdc_real_rain_predicted_rain_level": {
+      "none": 500,
+      "light": 0,
+      "medium": 0,
+      "heavy": 0
+    },
+    "bdd_real_rain_predicted_rain_level": {
+      "none": 396,
+      "light": 0,
+      "medium": 0,
+      "heavy": 0
+    },
+    "dawn_real_rain_predicted_rain_level": {
+      "none": 197,
+      "light": 0,
+      "medium": 2,
+      "heavy": 1
+    }
+  },
+  "dawn_sandstorm_out_of_distribution_probe": {
+    "n": 323,
+    "predicted": {
+      "clear": 10,
+      "fog": 310,
+      "night": 1,
+      "rain": 2,
+      "snow": 0
+    },
+    "mean_top_probability": 0.8800842761993408,
+    "note": "sandstorm is a weather the model was never taught and is not a class; fog is the sensible answer"
+  },
+  "comparison_on_identical_real_test_rows": {
+    "v2_retrained": {
+      "acdc_test_accuracy": 0.9895,
+      "acdc_test_macro_f1": 0.9859860465292289,
+      "bdd_test_unseen_by_v2_accuracy": 0.9453968253968253,
+      "bdd_test_unseen_by_v2_macro_f1": 0.7053460307224119,
+      "dawn_external_accuracy": 0.6917613636363636,
+      "dawn_external_macro_f1": 0.43240916299223303,
+      "bdd_clear_recall": 0.9516380655226209,
+      "bdd_night_recall": 0.9866905554133606,
+      "bdd_rain_recall": 0.7320441988950276,
+      "bdd_snow_recall": 0.6919191919191919,
+      "dawn_fog_recall": 0.7233333333333334,
+      "dawn_rain_recall": 0.53,
+      "dawn_snow_recall": 0.803921568627451,
+      "cityscapes_clear_called_clear": 0.998,
+      "cityscapes_fog_beta_0.005_called_fog": 0.992,
+      "cityscapes_fog_beta_0.01_called_fog": 1.0,
+      "cityscapes_fog_beta_0.02_called_fog": 1.0,
+      "cityscapes_rain_called_rain": 1.0
+    },
+    "v3": {
+      "acdc_test_accuracy": 0.99475,
+      "acdc_test_macro_f1": 0.9935591867682103,
+      "bdd_test_unseen_by_v2_accuracy": 0.9537777777777777,
+      "bdd_test_unseen_by_v2_macro_f1": 0.7241906771744112,
+      "dawn_external_accuracy": 0.7400568181818182,
+      "dawn_external_macro_f1": 0.42841364539951765,
+      "bdd_clear_recall": 0.963182527301092,
+      "bdd_night_recall": 0.988994113130279,
+      "bdd_rain_recall": 0.7209944751381215,
+      "bdd_snow_recall": 0.75,
+      "dawn_fog_recall": 0.9466666666666667,
+      "dawn_rain_recall": 0.3,
+      "dawn_snow_recall": 0.8676470588235294,
+      "cityscapes_clear_called_clear": 0.996,
+      "cityscapes_fog_beta_0.005_called_fog": 0.992,
+      "cityscapes_fog_beta_0.01_called_fog": 0.996,
+      "cityscapes_fog_beta_0.02_called_fog": 1.0,
+      "cityscapes_rain_called_rain": 1.0
+    },
+    "convnext_full": {
+      "acdc_test_accuracy": 0.99075,
+      "acdc_test_macro_f1": 0.9887639288854997,
+      "bdd_test_unseen_by_v2_accuracy": 0.9594920634920635,
+      "bdd_test_unseen_by_v2_macro_f1": 0.7515160874073363,
+      "dawn_external_accuracy": 0.7272727272727273,
+      "dawn_external_macro_f1": 0.4389689322176379,
+      "bdd_clear_recall": 0.9613104524180968,
+      "bdd_night_recall": 0.9920655234195035,
+      "bdd_rain_recall": 0.7762430939226519,
+      "bdd_snow_recall": 0.797979797979798,
+      "dawn_fog_recall": 0.8866666666666667,
+      "dawn_rain_recall": 0.495,
+      "dawn_snow_recall": 0.7205882352941176,
+      "cityscapes_clear_called_clear": 0.998,
+      "cityscapes_fog_beta_0.005_called_fog": 0.994,
+      "cityscapes_fog_beta_0.01_called_fog": 1.0,
+      "cityscapes_fog_beta_0.02_called_fog": 1.0,
+      "cityscapes_rain_called_rain": 1.0
+    },
+    "dinov2_last2": {
+      "acdc_test_accuracy": 0.99675,
+      "acdc_test_macro_f1": 0.996467858401366,
+      "bdd_test_unseen_by_v2_accuracy": 0.9584761904761905,
+      "bdd_test_unseen_by_v2_macro_f1": 0.7480621791739821,
+      "dawn_external_accuracy": 0.6747159090909091,
+      "dawn_external_macro_f1": 0.3984555119072299,
+      "bdd_clear_recall": 0.9522620904836193,
+      "bdd_night_recall": 0.9936012285641157,
+      "bdd_rain_recall": 0.8121546961325967,
+      "bdd_snow_recall": 0.803030303030303,
+      "dawn_fog_recall": 0.9266666666666666,
+      "dawn_rain_recall": 0.455,
+      "dawn_snow_recall": 0.5196078431372549,
+      "cityscapes_clear_called_clear": 0.998,
+      "cityscapes_fog_beta_0.005_called_fog": 0.984,
+      "cityscapes_fog_beta_0.01_called_fog": 0.998,
+      "cityscapes_fog_beta_0.02_called_fog": 1.0,
+      "cityscapes_rain_called_rain": 1.0
+    },
+    "v4_final": {
+      "acdc_test_accuracy": 0.99725,
+      "acdc_test_macro_f1": 0.9968112959081401,
+      "bdd_test_unseen_by_v2_accuracy": 0.9635555555555556,
+      "bdd_test_unseen_by_v2_macro_f1": 0.7887792196971969,
+      "dawn_external_accuracy": 0.7428977272727273,
+      "dawn_external_macro_f1": 0.4475833501490357,
+      "bdd_clear_recall": 0.9656786271450858,
+      "bdd_night_recall": 0.993857179421551,
+      "bdd_rain_recall": 0.8121546961325967,
+      "bdd_snow_recall": 0.7929292929292929,
+      "dawn_fog_recall": 0.9333333333333333,
+      "dawn_rain_recall": 0.515,
+      "dawn_snow_recall": 0.6862745098039216,
+      "cityscapes_clear_called_clear": 1.0,
+      "cityscapes_fog_beta_0.005_called_fog": 0.994,
+      "cityscapes_fog_beta_0.01_called_fog": 0.998,
+      "cityscapes_fog_beta_0.02_called_fog": 1.0,
+      "cityscapes_rain_called_rain": 1.0
+    }
+  }
+}

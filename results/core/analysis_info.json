@@ -1,0 +1,10 @@
+{
+  "records": "<project root>\\results\\core\\records\\yolo26m_off.jsonl",
+  "records_on": "<project root>\\results\\core\\records\\yolo26m_on.jsonl",
+  "figures": [
+    "danger_gap.png",
+    "enhancement_on_vs_off.png",
+    "quadrant.png",
+    "severity_sweep.png"
+  ]
+}
