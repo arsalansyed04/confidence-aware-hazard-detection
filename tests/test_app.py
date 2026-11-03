@@ -108,6 +108,46 @@ def test_camera_mode_headless_with_fake_capture(tmp_path, monkeypatch):
     assert len(list(csv.DictReader(open(csvp)))) == 5
 
 
+def test_show_reports_missing_highgui_without_masking_cleanup(tmp_path, monkeypatch):
+    class FakeCap:
+        released = False
+
+        def read(self):
+            return True, np.zeros((240, 320, 3), np.uint8)
+
+        def release(self):
+            self.released = True
+
+    def fail_imshow(*args):
+        raise cv2.error("HighGUI unavailable")
+
+    monkeypatch.setattr(P, "Pipeline", FakePipeline)
+    monkeypatch.setattr(A.cv2, "imshow", fail_imshow)
+    monkeypatch.setattr(A.cv2, "destroyAllWindows", lambda: pytest.fail("no window was opened"))
+    cap = FakeCap()
+    args = A.parse_args(["video", "--input", str(tmp_path / "in.mp4")])
+
+    with pytest.raises(RuntimeError, match="OpenCV HighGUI is unavailable"):
+        A.run(args, cap, "video in.mp4", show=True)
+    assert cap.released
+
+
+def test_show_fails_fast_when_opencv_has_no_gui_backend(monkeypatch):
+    class FakeCap:
+        def release(self):
+            pass
+
+    def unexpected_pipeline(*args, **kwargs):
+        pytest.fail("pipeline should not load when GUI support is missing")
+
+    monkeypatch.setattr(A.cv2, "getBuildInformation", lambda: "General:\nGUI: NONE\n")
+    monkeypatch.setattr(P, "Pipeline", unexpected_pipeline)
+    args = A.parse_args(["video", "--input", "unused.mp4"])
+
+    with pytest.raises(RuntimeError, match="OpenCV build has no GUI backend"):
+        A.run(args, FakeCap(), "video unused.mp4", show=True)
+
+
 @pytest.mark.slow
 def test_real_pipeline_on_real_frames():
     """Loads v4, YOLO and (if trained) the trust model; needs the GPU and the datasets."""

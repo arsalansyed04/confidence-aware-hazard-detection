@@ -154,6 +154,20 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 pip install -r requirements.txt
 ```
 
+### OpenCV preview errors on Windows
+
+If `--show` or camera mode reports that OpenCV's `imshow` is not implemented, check that the
+headless and GUI OpenCV wheels are not both installed. In the project's virtual environment, run:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip uninstall -y opencv-python-headless
+.\.venv\Scripts\python.exe -m pip install --force-reinstall opencv-python==5.0.0.93
+```
+
+Restart the app after reinstalling. The preview needs the GUI-enabled `opencv-python` package;
+headless installs cannot create preview windows. The app checks OpenCV's GUI backend before loading
+the models when a preview is requested, so a headless build is reported immediately.
+
 ### Running Test Suite
 Verify pipeline integrity via the automated test suite (38 unit & regression tests):
 ```powershell

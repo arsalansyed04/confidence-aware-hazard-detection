@@ -103,7 +103,21 @@ def csv_row(i: int, t: float, r: dict) -> list:
             *[round(r["timings_ms"].get(k, 0.0), 1) for k in ("weather", "enhance", "detect", "trust_danger")]]
 
 
+def ensure_gui_available():
+    gui_backend = next(
+        (line.partition(":")[2].strip() for line in cv2.getBuildInformation().splitlines() if line.strip().startswith("GUI:")),
+        "",
+    )
+    if not gui_backend or gui_backend.upper() == "NONE":
+        raise RuntimeError(
+            "[app] cannot display the preview: this OpenCV build has no GUI backend. "
+            "Remove opencv-python-headless and install the GUI-enabled opencv-python package."
+        )
+
+
 def run(a, cap: cv2.VideoCapture, label: str, show: bool, stride: int = 1, fps_in: float | None = None):
+    if show:
+        ensure_gui_available()
     from pipeline import Pipeline
     pipe = Pipeline(a.detector, a.trust_model, not a.no_enhance, a.device, a.imgsz, a.conf, a.weather_every, a.flip_every, not a.no_dino)
     print(f"[app] {label} | detector {pipe.det.name} | trust model {'loaded' if pipe.trust else 'MISSING (trust shown as n/a)'} | "
@@ -122,6 +136,7 @@ def run(a, cap: cv2.VideoCapture, label: str, show: bool, stride: int = 1, fps_i
     t_start = time.perf_counter()
     last = t_start
     fps_est = None
+    window_opened = False
     try:
         while True:
             ok, frame = cap.read()
@@ -155,8 +170,16 @@ def run(a, cap: cv2.VideoCapture, label: str, show: bool, stride: int = 1, fps_i
                                        "meta": r["meta"], "timings_ms": r["timings_ms"]})
             done += 1
             if show:
-                cv2.imshow("weather-adaptive hazard detection", vis)
-                k = cv2.waitKey(1) & 0xFF
+                try:
+                    cv2.imshow("weather-adaptive hazard detection", vis)
+                    window_opened = True
+                    k = cv2.waitKey(1) & 0xFF
+                except cv2.error as exc:
+                    raise RuntimeError(
+                        "[app] cannot display the preview: OpenCV HighGUI is unavailable. "
+                        "Remove opencv-python-headless, then reinstall the GUI-enabled "
+                        "opencv-python package."
+                    ) from exc
                 if k in (ord("q"), 27):
                     print("[app] stopped by user")
                     break
@@ -173,8 +196,11 @@ def run(a, cap: cv2.VideoCapture, label: str, show: bool, stride: int = 1, fps_i
             writer.release()
         if csv_f is not None:
             csv_f.close()
-        if show:
-            cv2.destroyAllWindows()
+        if window_opened:
+            try:
+                cv2.destroyAllWindows()
+            except cv2.error as exc:
+                print(f"[app] warning: could not close the OpenCV preview window: {exc}")
     el = time.perf_counter() - t_start
     print(f"[app] processed {done} frames in {el:.1f}s ({done / max(el, 1e-6):.1f} fps)"
           + (f" | video -> {a.output}" if a.output else "") + (f" | csv -> {a.csv}" if a.csv else ""))
