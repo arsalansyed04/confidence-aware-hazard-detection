@@ -1,0 +1,23 @@
+{
+  "bootstrap": {
+    "B": 2000,
+    "unit": "video/sequence",
+    "seed": 0
+  },
+  "strata_trust_beats_conf_ci_excludes_0": 13,
+  "strata_total": 21,
+  "pooled": {
+    "auroc_trust": 0.7389518398611904,
+    "auroc_trust_lo": 0.7192020150755788,
+    "auroc_trust_hi": 0.7573454626738381,
+    "auroc_conf": 0.6103750407813873,
+    "delta": 0.12857679907980313,
+    "delta_lo": 0.10158143614260656,
+    "delta_hi": 0.15491699616577542
+  },
+  "isotonic_fitted_on": "bdd_val_clear",
+  "ece_pooled_raw_vs_cal": [
+    0.09241260082919349,
+    0.14765740808092484
+  ]
+}
