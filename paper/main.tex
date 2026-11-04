@@ -1,0 +1,466 @@
+%% Manuscript for Data Science and Engineering (Springer Nature).
+%% Build with the official Springer Nature LaTeX template (sn-jnl.cls + sn-mathphys-num.bst),
+%% e.g. on Overleaf: "Springer Nature LaTeX Template" -> replace its .tex with this file,
+%% upload references.bib and the figures/ folder.
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{url}
+
+\newcommand{\Rtrue}{R_{\mathrm{true}}}
+\newcommand{\Rest}{R_{\mathrm{est}}}
+
+\raggedbottom
+
+\begin{document}
+
+\title[Decoupling Trust and Danger in Weather-Degraded Driving Perception]{Decoupling Trust from Danger: Runtime Failure Prediction for Weather-Degraded Monocular Driving Perception}
+
+%% TODO(authors): confirm author order, affiliations and the corresponding author with your supervisor.
+\author*[1]{\fnm{Syed} \sur{Arsalan}}\email{syed.arsalan2023@gmail.com}
+\author[1]{\fnm{[Supervisor]} \sur{[Name]}}\email{[email]}
+\affil[1]{\orgdiv{Department of Computer Science and Engineering}, \orgname{[University]}, \orgaddress{\city{Chennai}, \country{India}}}
+
+\abstract{Object detectors used for driving perception degrade at night and in adverse weather conditions like during the rain, snow and fog; and they degrade without any warning: their confidence scores remain high while their outputs deteriorate. A single fused risk score does not take visibility into account, because of which a road that looks empty in dense fog receives a low risk score. We propose a perception readout with two decoupled axes per frame. \emph{Trust} is the predicted probability that the frozen detector's output on the current frame is correct, estimated at runtime (without ground truth) by a gradient-boosted introspective model accounting for 30 meta-features (confidence statistics, flip-consistency, distance to clear-day data in a self-supervised feature space, raw-frame image quality and weather-classifier outputs). \emph{Danger} is a normalised hazard score computed from the detections, and its underestimation is measured directly by evaluating the same formula on ground-truth annotations. The trust model is trained only on 3,000 clear-day BDD100K frames and tested on 10,824 frames from 21 held-out strata spanning unseen weather, two unseen cameras (ACDC, Cityscapes) and synthetic corruptions. With video-level cluster-bootstrap confidence intervals, pooled failure-prediction AUROC is 0.739 [0.719, 0.757] against 0.610 [0.592, 0.631] for detection confidence, and the excess area under the risk--coverage curve falls by 34\%. The detected danger underestimates the true danger in every stratum, most at night and monotonically with fog density on identical scenes. Frames with low trust and low apparent danger are underestimated by more than 0.1 in 66\% of cases, against 13.5\% in other quadrants. We also report where the approach falls short: gains are not significant on two of four cross-camera ACDC conditions, and clear-day probability calibration does not transfer to adverse weather. The full system runs at 20.6 frames per second at 720p on a laptop GPU.}
+
+\keywords{Introspective perception, Failure prediction, Selective prediction, Adverse weather, Object detection, Autonomous driving}
+
+\maketitle
+
+%% =====================================================================
+\section{Introduction}\label{sec:intro}
+%% =====================================================================
+
+Driving is most dangerous at night and in rain, snow and fog, and these are the conditions in which camera-based object detectors become the most unreliable~\cite{michaelis2019winter,bijelic2020seeing}. The degradation is silent: the confidence a detector attaches to a box is a poor estimate of its probability of being correct, and miscalibration grows under distribution shift~\cite{guo2017calibration,ovadia2019trust}. A downstream planner therefore receives detections it cannot audit. Introspective perception addresses this by learning, from features of the perception process itself, to predict when perception will fail~\cite{daftry2016introspective,rabiee2019ivoa}. A system that knows when not to believe its perception can slow down, request a second sensor or hand control back to a driver.
+
+Most existing driving-risk pipelines go one step further and fuse perception confidence and/or scene hazard into a single number. This fusion hides the failure mode that matters most. Consider an apparently empty road in dense fog. The detector returns no boxes, so a fused score reports low risk. In reality the scene has \emph{low apparent danger} together with \emph{low trust}: it looks safe precisely because the detector may not be seeing the pedestrian in it. Detecting this situation requires the two quantities to not be fused and treated separately.
+
+Building such a two-axis readout raises three practical challenges.
+
+\textbf{1. Failure must be predicted without ground truth and under shifts not seen in training.} At deployment no annotation is available, and adverse-weather data with box annotations is scarce. A useful introspective model must be trained on plentiful clear-weather data and still be able to rank frames correctly in weather (and on cameras) it has never seen. Its evaluation must therefore separate weather shift from camera shift.
+
+\textbf{2. Danger estimated from detections is biased, and the bias is rarely measured.} A hazard score computed on detected objects inherits every missed detection. Quantifying this bias requires computing the same score on ground truth as well, which previous works on risk estimation from monocular video seldom do.
+
+\textbf{3. Small evaluation sets with correlated frames inflate apparent gains.} Adverse-weather benchmarks contain few sequences (ACDC has 6--12 recordings per condition), and consecutive frames are strongly correlated. Point estimates per weather condition without uncertainty can suggest consistent improvements that are not statistically supported.
+
+To address these challenges, we build and evaluate a confidence-aware, weather-adaptive perception pipeline for monocular driving video (Fig.~\ref{fig:pipeline}). Its contributions are:
+
+\begin{itemize}
+\item A \textbf{decoupled trust--danger readout} in which trust is predicted by a lightweight gradient-boosted introspective model over 30 runtime meta-features from five families, trained on clear-day data only, and danger is a normalised hazard score whose underestimation is measured against the same score on annotations ($\Delta = \Rtrue - \Rest$).
+\item A \textbf{shift-stratified evaluation protocol} over 13,824 frames from BDD100K, ACDC, Cityscapes/Foggy Cityscapes and synthetic corruptions, which separates weather shift from camera shift by using paired clear and foggy renderings of identical scenes, and which reports every result with video-level cluster-bootstrap confidence intervals and selective-prediction metrics.
+\item \textbf{Empirical findings} on what transfers and what does not: failure \emph{ranking} transfers to unseen weather (pooled AUROC 0.739 vs.\ 0.610 for confidence; E-AURC reduced by 34\%) but clear-day \emph{calibration} does not; danger is underestimated in every stratum; and the low-trust/low-danger quadrant isolates the frames where danger is most underestimated. We also report a controlled comparison of three detector generations under weather, a tested adaptive-enhancement stage, and a real-time implementation.
+\end{itemize}
+
+The remainder of the paper is organised as follows. Section~\ref{sec:related} reviews related work. Section~\ref{sec:method} describes the method. Section~\ref{sec:exp} presents the experimental protocol and results. Section~\ref{sec:discussion} discusses limitations, and Section~\ref{sec:conclusion} concludes.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/pipeline.png}
+\caption{Overview of the proposed pipeline. A weather classifier selects an enhancement recipe; a frozen detector runs on the enhanced frame and on its mirror image. The trust branch combines meta-features (image-quality features are taken from the \emph{raw} frame, dashed path) in a gradient-boosted model trained on clear-day data only. The danger branch applies a weighted hazard formula to the detections. The two axes are combined only in the final quadrant readout.}
+\label{fig:pipeline}
+\end{figure*}
+
+%% =====================================================================
+\section{Related Work}\label{sec:related}
+%% =====================================================================
+
+\textbf{Introspective perception and failure prediction.} Daftry et al.~\cite{daftry2016introspective} introduced introspective perception, training a model to predict from features of the perception process whether a vision system's output will be wrong, and used it to decide when a micro-aerial vehicle should trust its own perception. Rabiee and Biswas~\cite{rabiee2019ivoa} applied the idea to stereo obstacle detection. For object detectors specifically, MetaDetect~\cite{schubert2021metadetect} regresses per-box quality from hand-crafted box-level meta-features, and Rahman et al.~\cite{rahman2021online} predict frame-level detection performance online from the detector's internal features. Our work follows the frame-level formulation of~\cite{rahman2021online} but uses only signals available from a black-box detector, trains on a single condition, and evaluates transfer across both weather and camera.
+
+\textbf{Uncertainty, calibration and selective prediction.} Modern networks are overconfident, and temperature scaling corrects this only in distribution~\cite{guo2017calibration}; under dataset shift, calibration of most uncertainty methods deteriorates~\cite{ovadia2019trust}. Bayesian and ensemble methods~\cite{kendall2017uncertainties,lakshminarayanan2017ensembles} and probabilistic detectors~\cite{feng2022review} improve uncertainty estimates but require retraining or multiple forward passes of the detector. Calibration of detector confidence has been extended to box geometry~\cite{kuppers2020multivariate}. The maximum softmax probability is the standard baseline for detecting misclassification~\cite{hendrycks2017baseline}; we use its detection analogue, mean box confidence, as our baseline. Selective prediction~\cite{geifman2017selective} evaluates a confidence score by the risk incurred when only the most confident fraction of inputs is accepted; we adopt the area under the risk--coverage curve (AURC) and its excess over the optimum (E-AURC)~\cite{geifman2019biasreduced}. Feature-space nearest-neighbour distances are effective out-of-distribution scores~\cite{sun2022knn}, and we use them as one feature family.
+
+\textbf{Robustness of detection to weather.} Benchmarks with synthetic corruptions~\cite{hendrycks2019benchmarking,michaelis2019winter} show large and graded degradation of detectors. Real adverse-weather data is provided by BDD100K~\cite{yu2020bdd100k}, ACDC~\cite{sakaridis2021acdc}, Foggy Cityscapes~\cite{sakaridis2018foggy} and DAWN~\cite{kenk2020dawn}; multimodal fusion with lidar and radar~\cite{bijelic2020seeing} is an alternative where those sensors are available. Image restoration as a pre-processing step does not necessarily help recognition~\cite{pei2018haze}, which motivated jointly learned enhancement such as IA-YOLO~\cite{liu2022iayolo}. We treat classical enhancement~\cite{he2011darkchannel,zuiderveld1994clahe} as a hypothesis to be tested rather than assumed, and check explicitly that it does not inflate confidence.
+
+%% =====================================================================
+\section{Method}\label{sec:method}
+%% =====================================================================
+
+\subsection{Problem Formulation}
+
+Let $x_t$ be the frame at time $t$ and $D(x_t) = \{(b_i, c_i, s_i)\}$ the boxes, classes and confidences returned by a frozen detector $D$. Given annotations $G_t$ (available only offline), we call a frame a \emph{failure}, $y_t = 1$, if its detection F1 at IoU 0.5 is below 0.5 \emph{or} at least one annotated pedestrian is missed. Detections are matched greedily and one-to-one to annotations of the same class; boxes shorter than 12 pixels are ignored. The pedestrian clause makes the label safety-relevant: a frame on which every car is found but a person is missed is a failure.
+
+We seek two functions computable at runtime without $G_t$:
+\begin{itemize}
+\item a trust score $T(x_t) = 1 - \hat{P}(y_t = 1 \mid \phi(x_t)) \in [0,1]$, where $\phi$ is a meta-feature vector; and
+\item a danger score $\Rest(x_t) = R(D(x_t), w_t) \in [0,1]$, where $w_t$ is the weather condition.
+\end{itemize}
+Offline, the same danger function evaluated on annotations, $\Rtrue = R(G_t, w_t)$, gives the danger gap $\Delta_t = \Rtrue - \Rest$.
+
+\subsection{Weather Classifier}
+
+A classifier with a shared backbone and three heads predicts the condition (clear, fog, night, rain, snow), a fog level (none, light, medium, dense, tied to the Foggy Cityscapes attenuation coefficients $\beta \in \{0.005, 0.01, 0.02\}$, i.e.\ visibility of roughly 600, 300 and 150\,m~\cite{sakaridis2018foggy}) and a rain level. The final model ensembles a DINOv2 ViT-S/14~\cite{oquab2024dinov2} with its last two blocks fine-tuned and a fully fine-tuned ConvNeXt-Tiny~\cite{liu2022convnext}, with mirror test-time averaging. It is trained on 54,822 BDD100K images, ACDC, clean, foggy and rainy Cityscapes, and fog rendered onto clear frames of every camera with monocular depth~\cite{yang2024depthv2} using the atmospheric scattering model. Augmentation is geometric and camera-agnostic only; brightness and contrast are never perturbed because they carry the fog and night cues.
+
+During the project we found an interesting \emph{camera shortcut}: a model trained without clean Cityscapes frames scored 100\% on foggy Cityscapes, but labelled 59 of 60 \emph{clear} Cityscapes frames as fog, i.e.\ it had fixated on the camera rather than learning the weather. Including clean frames of every camera removed the discrepancy, and we decided to report leave-one-camera-out accuracy as the honest generalisation figure. Crucially, the weather classifier is used only at runtime (to select enhancement and as a trust feature); all evaluation strata are defined by the datasets' own weather tags, so classifier errors cannot leak into the experimental conditions.
+
+\subsection{Trust Features and Model}\label{sec:trust}
+
+The meta-feature vector $\phi(x_t) \in \mathbb{R}^{30}$ can be categorized into 5 families:
+
+\begin{enumerate}
+\item \textbf{Confidence statistics} (11): number of detections and of persons; mean, maximum, minimum and standard deviation of confidence; fraction of boxes below 0.5 and above 0.8; mean box area; class entropy; number of small boxes.
+\item \textbf{Flip-consistency} (4): the detector is re-run on the horizontally mirrored frame and its boxes are mapped back; we compute the Dice overlap of the two box sets, the confidence agreement of matched pairs, the count difference and a person-only Dice. This replaces temporal persistence, which is unavailable on the single-frame benchmarks.
+\item \textbf{Feature-space distance} (3): cosine distance from the frame's DINOv2 embedding to its $k=5$ nearest neighbours among the clear-day training frames (mean and minimum), and to their mean embedding~\cite{sun2022knn}.
+\item \textbf{Raw-frame image quality} (6): Laplacian variance, RMS contrast, mean brightness, dark-channel haze estimate~\cite{he2011darkchannel}, saturation and edge density. These are computed on the frame \emph{before} enhancement, so that enhancement artefacts cannot mask degradation.
+\item \textbf{Weather} (6): the classifier's five condition probabilities and its fog level.
+\end{enumerate}
+
+An XGBoost classifier~\cite{chen2016xgboost} (400 trees, depth 4, learning rate 0.05, row and column subsampling 0.8, class-weighted) is fitted to predict $y_t$ from $\phi(x_t)$ on clear-day frames only, and trust is $T = 1 - \hat{P}(y=1)$. Training on a single condition is deliberate: it makes every adverse stratum a genuine test of transfer, and it reflects the practical situation in which clear-weather data with annotations is far more plentiful than adverse-weather data.
+
+\subsection{Danger Score}\label{sec:danger}
+
+Each object $j$ with class $c_j$ and box $b_j$ contributes $w_{c_j} \cdot \rho(b_j)$, where the class weight is $w_{c}=1.0$ for persons, 0.9 for bicycles and motorcycles, 0.6 for trucks and buses, 0.5 for cars and 0.1 for traffic lights, and the relevance $\rho(b) \in [0,1]$ increases with box size, with lowness in the image (proximity under a flat-ground assumption) and with horizontal centrality (proximity to the ego path). The object term saturates and is combined with a weather-severity term $\sigma(w)$:
+\begin{equation}
+R = 0.7\left(1 - \exp\Big(-3\sum_j w_{c_j}\,\rho(b_j)\Big)\right) + 0.3\,\sigma(w),
+\label{eq:danger}
+\end{equation}
+with $\sigma = 0$ for clear, 0.4 for rain, 0.5 for night and snow, and 0.5--0.9 for fog by level. The same weather term enters both $\Rest$ and $\Rtrue$, so $\Delta$ isolates the distortion introduced by detection. As the weights are hand-set, we test their influence by perturbing each by $\pm 50\%$ (Sect.~\ref{sec:res_danger}).
+
+\subsection{Weather-Adaptive Enhancement}
+
+Enhancement operates on luminance only. Clear frames are untouched. Light fog receives CLAHE~\cite{zuiderveld1994clahe}; medium and dense fog receive dark-channel dehazing~\cite{he2011darkchannel} with guided-filter refinement, a transmission floor and a sky guard, followed by CLAHE (and a bilateral denoise for dense fog). Night receives adaptive gamma towards a target mean luminance of 0.45, CLAHE and a bilateral filter; rain receives CLAHE; over-bright snow frames receive a gamma above one and CLAHE. Every experiment is run with enhancement on and off, and we track the mean confidence of true positives to detect enhancement that inflates confidence without improving correctness.
+
+\subsection{Decoupled Readout}
+
+At runtime each frame is placed in the trust--danger plane. We flag the quadrant $T < 0.5$, $\Rest < 0.4$ as \emph{low trust, low apparent danger}: the case that a fused score would report as safe.
+
+%% =====================================================================
+\section{Experiments}\label{sec:exp}
+%% =====================================================================
+
+\subsection{Datasets and Evaluation Strata}
+
+All data are public. We use BDD100K~\cite{yu2020bdd100k} (2D boxes and per-image weather and time-of-day tags), the ACDC detection annotations~\cite{sakaridis2021acdc}, Cityscapes~\cite{cordts2016cityscapes} with boxes derived from gtFine instance masks together with Foggy Cityscapes-DBF~\cite{sakaridis2018foggy}, and DAWN~\cite{kenk2020dawn} as an external weather-classification test. Classes are mapped to a seven-class vocabulary (person including riders, car, truck, bus, bicycle, motorcycle, traffic light).
+
+Table~\ref{tab:strata} lists the evaluation strata, drawn with a fixed seed: 12,024 real frames plus 1,800 synthetic corruptions. The design separates three kinds of shift relative to the trust training data: \emph{weather only} (BDD100K validation night, rain, snow), \emph{camera and weather} (ACDC), and \emph{camera with controlled weather} (the same 800 Cityscapes scenes, clear and at three fog densities, with identical annotations). Synthetic fog, frost and motion blur at severities 1, 3 and 5~\cite{hendrycks2019benchmarking} are applied to 200 held-out clear BDD100K frames, so that severity is the only variable.
+
+\begin{table}[t]
+\caption{Evaluation strata. ``Seq.'' is the number of distinct videos or recordings, the resampling unit of the bootstrap.}
+\label{tab:strata}
+\footnotesize
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Stratum & Shift vs.\ training & Frames & Seq. \\
+\midrule
+BDD train clear (trust training) & none & 3,000 & -- \\
+BDD val clear & none (held out) & 1,500 & 1,274 \\
+BDD val night & weather & 1,500 & 1,159 \\
+BDD val rain & weather & 396 & 291 \\
+BDD val snow & weather & 422 & 306 \\
+ACDC fog / night / rain / snow & camera + weather & 500 each & 11 / 6 / 11 / 12 \\
+Cityscapes clear + 3 fog levels & camera (+ fog) & 800 $\times$ 4 & 493 \\
+Synthetic fog, frost, blur (sev.\ 1, 3, 5) & corruption & 200 each & 166 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrics and Statistical Protocol}
+
+Detection is evaluated by VOC-style AP50, precision and pedestrian recall at the operating confidence 0.25. Trust is evaluated by the AUROC of predicting failure, by AURC and E-AURC~\cite{geifman2019biasreduced}, and by the residual failure rate at fixed coverage (acting only on the most-trusted fraction of frames). Calibration of $\hat P(y{=}1)$ is measured by the expected calibration error (ECE, 10 bins) and the Brier score. Danger is evaluated by the mean gap $\Delta$, the fraction of frames underestimated by more than 0.1, and the Spearman correlation of $\Rest$ with $\Rtrue$.
+
+Frames from the same video are correlated, and ACDC contains only 6--12 recordings per condition. All confidence intervals are therefore 95\% percentile intervals from a \emph{cluster} bootstrap~\cite{efron1993bootstrap} that resamples whole videos or recordings ($B = 2{,}000$). For the difference between trust and the confidence baseline we use a paired bootstrap on the same resamples. We regard an improvement as significant when the interval of the difference excludes zero.
+
+\subsection{Implementation Details}
+
+Experiments use Python 3.12, PyTorch 2.11 with CUDA 12.8, Ultralytics 8.4~\cite{ultralytics}, XGBoost~\cite{chen2016xgboost} and scikit-learn on a laptop with an NVIDIA RTX 5060 (8\,GB). Detections are stored down to confidence 0.05 so that thresholds can be re-applied without re-running the detector. The only trained components are the weather classifier and the trust model; the detector and the DINOv2 feature extractor used for trust are frozen.
+
+\subsection{Detector Selection Under Weather}
+
+Because confidence behaves differently across detectors, the whole pipeline is built on a single detector chosen by a rule fixed before the run: the best adverse-weather pedestrian recall among models whose precision is within five points of the best, with the smallest clear-to-adverse drop as tie-breaker. Table~\ref{tab:detectors} compares three COCO-pretrained generations on identical frames. YOLO26m wins on the rule and also degrades least from clear to adverse conditions; it is used throughout.
+
+\begin{table}[t]
+\caption{Three detector generations on identical frames, enhancement off. Adverse = night, rain, snow and fog strata of all cameras.}
+\label{tab:detectors}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& YOLO26m & YOLO11m & YOLOv8m \\
+\midrule
+Pedestrian recall, adverse & \textbf{0.443} & 0.409 & 0.413 \\
+Precision, adverse & 0.688 & \textbf{0.714} & 0.681 \\
+mAP50, adverse & \textbf{0.409} & 0.385 & 0.379 \\
+Pedestrian recall, clear & \textbf{0.477} & 0.446 & 0.459 \\
+Drop clear $\rightarrow$ adverse & \textbf{0.034} & 0.037 & 0.046 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:detection} reports YOLO26m per stratum. Night is the hardest real condition (ACDC night mAP50 0.244, with a pedestrian missed in 55\% of frames). On the paired Cityscapes scenes, where annotations are identical across rows, mAP50 falls from 0.457 (clear) to 0.387 (dense fog) and pedestrian recall from 0.461 to 0.398: a weather effect of about seven points with no change of camera. Under synthetic corruption at severity 5, mAP50 falls from 0.475 to 0.447 (fog), 0.275 (frost) and 0.144 (motion blur).
+
+\begin{table}[t]
+\caption{YOLO26m detection per stratum, enhancement off. ``Missed ped.'' is the fraction of frames in which at least one annotated pedestrian is missed; ``Fail'' is the failure rate used as the trust label. Cityscapes' high miss rate reflects its dense annotation of small and occluded people.}
+\label{tab:detection}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Stratum & mAP50 & Ped.\ recall & Precision & Missed ped. & Fail \\
+\midrule
+BDD val clear & 0.475 & 0.493 & 0.808 & 0.286 & 0.368 \\
+BDD val night & 0.335 & 0.352 & 0.707 & 0.182 & 0.571 \\
+BDD val rain & 0.493 & 0.468 & 0.803 & 0.283 & 0.359 \\
+BDD val snow & 0.441 & 0.542 & 0.800 & 0.296 & 0.370 \\
+ACDC fog & 0.545 & 0.559 & 0.613 & 0.148 & 0.316 \\
+ACDC night & 0.244 & 0.322 & 0.553 & 0.547 & 0.721 \\
+ACDC rain & 0.355 & 0.349 & 0.572 & 0.278 & 0.498 \\
+ACDC snow & 0.428 & 0.553 & 0.592 & 0.418 & 0.564 \\
+Cityscapes clear & 0.457 & 0.461 & 0.741 & 0.671 & 0.700 \\
+Cityscapes fog light & 0.440 & 0.450 & 0.741 & 0.676 & 0.703 \\
+Cityscapes fog medium & 0.425 & 0.433 & 0.744 & 0.682 & 0.718 \\
+Cityscapes fog dense & 0.387 & 0.398 & 0.752 & 0.705 & 0.741 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Failure Prediction}\label{sec:res_trust}
+
+Table~\ref{tab:trust} and Fig.~\ref{fig:forest} report the AUROC of failure prediction with cluster-bootstrap intervals. Pooled over all 21 held-out strata (10,824 frames, 3,437 sequences), trust reaches 0.739 [0.719, 0.757] against 0.610 [0.592, 0.631] for mean confidence, a paired improvement of +0.129 [+0.102, +0.155]. Over the 12 real adverse strata the improvement is +0.141 [+0.108, +0.171].
+
+The trust point estimate is higher than the baseline in all 21 strata, but the per-stratum interval of the difference excludes zero in 13 of them. The gain is significant everywhere on the training camera (BDD100K, +0.08 to +0.16), on all four Cityscapes rows (+0.06 to +0.08) and on ACDC night (+0.09) and snow (+0.05). It is \emph{not} significant on ACDC fog and rain, whose intervals are wide because they contain only 11 recordings each, nor on most 200-frame synthetic strata. On synthetic fog in particular, mean confidence is already a strong signal (0.71--0.75), leaving little room for improvement.
+
+Transfer degrades with the kind of shift. Under weather shift alone (BDD100K) AUROC stays at 0.73--0.76, close to the in-distribution 0.761. Under a new camera with controlled fog (Cityscapes) it is 0.73--0.74 and does not fall as fog thickens. Under a new camera with real weather (ACDC) it falls to 0.64--0.66. The Cityscapes rows show that a camera change alone does not explain the ACDC drop; the combination of camera and real weather does.
+
+\begin{table}[t]
+\caption{Failure prediction: AUROC with 95\% cluster-bootstrap intervals, the paired difference (trust $-$ confidence) and the residual failure rate when acting on the most-trusted 50\% of frames. $^\ast$: interval of the difference excludes 0.}
+\label{tab:trust}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Stratum & Fail rate & AUROC trust & AUROC conf. & $\Delta$AUROC & Fail@50\% \\
+\midrule
+BDD val clear & 0.368 & 0.761 [.735, .786] & 0.654 & +0.107$^\ast$ & 0.197 \\
+BDD val night & 0.571 & 0.730 [.706, .753] & 0.651 & +0.078$^\ast$ & 0.409 \\
+BDD val rain & 0.359 & 0.750 [.694, .801] & 0.592 & +0.158$^\ast$ & 0.207 \\
+BDD val snow & 0.370 & 0.729 [.677, .777] & 0.619 & +0.110$^\ast$ & 0.227 \\
+ACDC fog & 0.316 & 0.644 [.607, .689] & 0.603 & +0.041 & 0.228 \\
+ACDC night & 0.721 & 0.637 [.550, .704] & 0.544 & +0.092$^\ast$ & 0.652 \\
+ACDC rain & 0.498 & 0.663 [.607, .723] & 0.612 & +0.050 & 0.380 \\
+ACDC snow & 0.564 & 0.656 [.603, .705] & 0.605 & +0.051$^\ast$ & 0.444 \\
+Cityscapes clear & 0.700 & 0.731 [.687, .765] & 0.648 & +0.083$^\ast$ & 0.545 \\
+Cityscapes fog light & 0.703 & 0.733 [.686, .773] & 0.656 & +0.078$^\ast$ & 0.563 \\
+Cityscapes fog medium & 0.718 & 0.733 [.686, .772] & 0.670 & +0.063$^\ast$ & 0.585 \\
+Cityscapes fog dense & 0.741 & 0.744 [.700, .782] & 0.676 & +0.068$^\ast$ & 0.598 \\
+Synthetic fog 1 & 0.425 & 0.774 [.709, .833] & 0.750 & +0.024 & 0.250 \\
+Synthetic fog 3 & 0.440 & 0.765 [.699, .827] & 0.745 & +0.021 & 0.280 \\
+Synthetic fog 5 & 0.465 & 0.761 [.691, .824] & 0.711 & +0.050 & 0.260 \\
+Synthetic frost 1 & 0.450 & 0.807 [.745, .865] & 0.662 & +0.145$^\ast$ & 0.250 \\
+Synthetic frost 3 & 0.600 & 0.742 [.674, .804] & 0.680 & +0.062 & 0.420 \\
+Synthetic frost 5 & 0.600 & 0.732 [.663, .797] & 0.637 & +0.094$^\ast$ & 0.420 \\
+Synthetic blur 1 & 0.460 & 0.728 [.652, .794] & 0.682 & +0.046 & 0.310 \\
+Synthetic blur 3 & 0.590 & 0.680 [.601, .754] & 0.603 & +0.076 & 0.460 \\
+Synthetic blur 5 & 0.815 & 0.684 [.548, .798] & 0.569 & +0.115$^\ast$ & 0.730 \\
+\midrule
+Pooled, 21 held-out & 0.556 & 0.739 [.719, .757] & 0.610 & +0.129$^\ast$ & 0.382 \\
+Pooled, 12 real adverse & 0.586 & 0.722 [.702, .742] & 0.581 & +0.141$^\ast$ & 0.425 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{figures/auroc_forest.pdf}
+\caption{AUROC for predicting detector failure per held-out stratum, with 95\% cluster-bootstrap intervals (resampling videos). The trust model is trained on clear-day BDD100K frames only.}
+\label{fig:forest}
+\end{figure}
+
+\subsection{Selective Prediction}
+
+Trust is intended to gate downstream decisions, so we evaluate it as a selective predictor (Table~\ref{tab:selective}, Fig.~\ref{fig:riskcov}). Over all held-out frames, E-AURC falls from 0.274 with mean confidence to 0.180 with trust (34\% reduction); over the real adverse strata it falls from 0.293 to 0.200 (32\%). Acting only on the trusted half of frames reduces the failure rate from 55.6\% to 38.2\% pooled, from 36.8\% to 19.7\% on held-out clear frames and from 57.1\% to 40.9\% at night on BDD100K. Ranking by confidence yields a reduction only from 55.6\% to 47.6\%. A substantial gap to the oracle (11.2\% at 50\% coverage) remains.
+
+\begin{table}[t]
+\caption{Selective prediction over pooled held-out frames: area under the risk--coverage curve (AURC), its excess over the optimum (E-AURC), both lower is better, and the failure rate at several coverages.}
+\label{tab:selective}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Pool & Score & AURC & E-AURC & @100\% & @80\% & @60\% & @50\% \\
+\midrule
+\multirow{3}{*}{All 21 held-out} & Confidence & 0.470 & 0.274 & 0.556 & 0.528 & 0.494 & 0.476 \\
+& Trust (ours) & \textbf{0.375} & \textbf{0.180} & 0.556 & \textbf{0.483} & \textbf{0.415} & \textbf{0.382} \\
+& Oracle & 0.196 & 0.000 & 0.556 & 0.445 & 0.260 & 0.112 \\
+\midrule
+\multirow{3}{*}{12 real adverse} & Confidence & 0.514 & 0.293 & 0.586 & 0.566 & 0.548 & 0.531 \\
+& Trust (ours) & \textbf{0.420} & \textbf{0.200} & 0.586 & \textbf{0.521} & \textbf{0.456} & \textbf{0.425} \\
+& Oracle & 0.221 & 0.000 & 0.586 & 0.482 & 0.309 & 0.171 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/risk_coverage.png}
+\caption{Risk--coverage curves: residual failure rate when acting only on the most-trusted fraction of frames, per stratum.}
+\label{fig:riskcov}
+\end{figure}
+
+\subsection{Calibration: Ranking Transfers, Probabilities Do Not}
+
+Trust ranks frames well under shift, but are its probabilities calibrated? Pooled over the 20 test strata, the raw $\hat P(y{=}1)$ has an ECE of 0.092 and a Brier score of 0.217. A natural remedy is to recalibrate on held-out clear data. We fitted isotonic regression~\cite{zadrozny2002isotonic} on BDD100K validation clear frames and froze it. This made calibration \emph{worse} on the shifted strata (ECE 0.148, Brier 0.229; Fig.~\ref{fig:reliability}). The recalibration lowers predicted failure probabilities to match the 36.8\% clear-day base rate, while adverse strata fail at 32--82\%. The base rate of failure shifts with the conditions, so a calibration map learned in one condition does not carry over. In practice trust should be used as a \emph{ranking} or with condition-specific thresholds, not as a calibrated probability, unless calibration data from the target condition is available. This is consistent with the observation that post-hoc calibration does not survive dataset shift~\cite{ovadia2019trust}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.5\linewidth]{figures/reliability.pdf}
+\caption{Reliability of the predicted failure probability on the 20 shifted test strata, raw and after isotonic recalibration fitted on clear-day BDD100K validation frames. Clear-day recalibration does not transfer under shift.}
+\label{fig:reliability}
+\end{figure}
+
+\subsection{Feature-Family Ablation}
+
+Removing one family at a time gives pooled held-out AUROC 0.739 (full), 0.690 without confidence statistics, 0.727 without image quality, 0.729 without the DINOv2 distance, 0.731 without flip-consistency and 0.741 without the weather probabilities. Confidence statistics are the most important family. Removing image quality, the DINOv2 distance or flip-consistency costs 0.008--0.012 each, which is below the width of the pooled confidence interval ($\pm$0.02), so these individual contributions should be regarded as suggestive. The weather probabilities add nothing: failure prediction does not need to be told which weather it is in, because its effect is already visible in the other families. The most important single features are the number of detected persons, person flip-consistency, class entropy, overall flip-consistency and maximum confidence. The fact that many detections are not the same as many \emph{reliable} detections is captured only by combining these signals, which is why the combined model outperforms any single confidence statistic.
+
+\subsection{Danger Underestimation}\label{sec:res_danger}
+
+Table~\ref{tab:danger} shows that the detected danger underestimates the true danger in every stratum, and every interval excludes zero. The gap is largest at night (0.091 on BDD100K and 0.104 on ACDC; 36\% and 46\% of frames underestimated by more than 0.1), where missed pedestrians remove the highest-weight terms. On identical Cityscapes scenes it grows monotonically with fog density, from 0.019 to 0.042, and it grows with every synthetic corruption severity. $\Rest$ nevertheless preserves the ranking of scenes (Spearman 0.77--0.89 on real strata), so the bias is systematic rather than random. Perturbing each class weight by $\pm$50\% leaves the frame ranking at Spearman $\ge 0.954$ and high/medium/low tercile agreement $\ge 0.875$ over 2,000 frames, so the conclusions do not depend on the hand-set weights.
+
+\begin{table}[t]
+\caption{Danger gap $\Delta = \Rtrue - \Rest$ with 95\% cluster-bootstrap intervals, fraction of frames underestimated by more than 0.1, and Spearman correlation between $\Rest$ and $\Rtrue$.}
+\label{tab:danger}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Stratum & $\Rtrue$ & $\Rest$ & $\Delta$ [95\% CI] & $>0.1$ & $\rho_s$ \\
+\midrule
+BDD val clear & 0.618 & 0.597 & 0.021 [.017, .025] & 9.1\% & 0.83 \\
+BDD val night & 0.718 & 0.627 & \textbf{0.091} [.084, .097] & \textbf{35.7\%} & 0.77 \\
+BDD val rain & 0.741 & 0.710 & 0.031 [.024, .039] & 11.4\% & 0.85 \\
+BDD val snow & 0.770 & 0.748 & 0.022 [.015, .030] & 9.2\% & 0.84 \\
+ACDC fog & 0.668 & 0.654 & 0.014 [.004, .025] & 12.4\% & 0.89 \\
+ACDC night & 0.614 & 0.511 & \textbf{0.104} [.083, .118] & \textbf{46.4\%} & 0.77 \\
+ACDC rain & 0.561 & 0.531 & 0.030 [.026, .035] & 18.4\% & 0.87 \\
+ACDC snow & 0.686 & 0.661 & 0.025 [.015, .036] & 15.2\% & 0.84 \\
+Cityscapes clear & 0.641 & 0.622 & 0.019 [.016, .022] & 5.9\% & 0.89 \\
+Cityscapes fog light & 0.791 & 0.767 & 0.024 [.020, .027] & 8.0\% & 0.89 \\
+Cityscapes fog medium & 0.851 & 0.822 & 0.029 [.025, .033] & 9.8\% & 0.88 \\
+Cityscapes fog dense & 0.911 & 0.868 & 0.042 [.037, .048] & 13.9\% & 0.87 \\
+Synthetic frost 1 & 0.614 & 0.569 & 0.045 [.034, .058] & 16.0\% & 0.81 \\
+Synthetic frost 3 & 0.614 & 0.518 & 0.096 [.077, .115] & 30.0\% & 0.75 \\
+Synthetic frost 5 & 0.614 & 0.496 & 0.117 [.098, .138] & 40.0\% & 0.71 \\
+Synthetic blur 1 & 0.614 & 0.598 & 0.016 [.003, .029] & 9.0\% & 0.80 \\
+Synthetic blur 3 & 0.614 & 0.568 & 0.046 [.028, .064] & 21.0\% & 0.67 \\
+Synthetic blur 5 & 0.614 & 0.520 & 0.094 [.074, .114] & 39.0\% & 0.54 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Does the Decoupled Readout Isolate the Blind Spot?}
+
+The central motivation for keeping the two axes apart is the low-trust, low-apparent-danger quadrant. Table~\ref{tab:quadrant} cross-tabulates held-out frames by both axes. Frames in that quadrant (7.8\% of held-out frames) have a mean danger gap of 0.192, and 65.7\% of them are underestimated by more than 0.1, compared with 13.5\% of frames outside it. They are also detector failures 66.9\% of the time.
+
+Two qualifications are necessary. First, most of the underestimation signal comes from the danger axis itself: a low $\Rest$ leaves more room for underestimation. Within low-apparent-danger frames, low trust raises the underestimation rate only from 57.7\% to 65.7\% and the gap from 0.153 to 0.192, although it raises the failure rate from 44.7\% to 66.9\%. Second, taken alone, trust is a weak predictor of danger underestimation (pooled AUROC 0.55): it predicts \emph{whether} detection failed, which includes false positives and missed cars, not specifically \emph{whether hazard was missed}. The quadrant is useful because it combines the two axes, not because either axis alone detects the blind spot. Training a trust model directly on the danger-gap target is a natural extension.
+
+\begin{table}[t]
+\caption{Held-out frames cross-tabulated by apparent danger ($\Rest < 0.4$) and trust ($T < 0.5$). ``Under'' = fraction with $\Delta > 0.1$.}
+\label{tab:quadrant}
+\begin{tabular}{@{}llrcccc@{}}
+\toprule
+Apparent danger & Trust & Frames & Fail rate & Missed ped. & Mean $\Delta$ & Under \\
+\midrule
+High & High & 5,102 & 0.378 & 0.277 & 0.029 & 11.6\% \\
+High & Low & 4,592 & 0.740 & 0.621 & 0.025 & 12.7\% \\
+Low & High & 291 & 0.447 & 0.168 & 0.153 & 57.7\% \\
+\textbf{Low} & \textbf{Low} & \textbf{839} & \textbf{0.669} & 0.229 & \textbf{0.192} & \textbf{65.7\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/quadrant.png}
+\caption{Trust against apparent danger per ground-truth condition; orange points are frames on which the detector failed. The bottom-left quadrant (low trust, low apparent danger) is the region a fused risk score would report as safe.}
+\label{fig:quadrant}
+\end{figure*}
+
+\subsection{Weather-Adaptive Enhancement}
+
+Table~\ref{tab:enh} compares enhancement on and off on identical frames. At night it adds 5.4--6.5 points of pedestrian recall, at a precision cost of 3.4 points on BDD100K; in dense fog it adds 4.2 points of recall and 2.8 points of mAP50, with gains increasing with fog density. In rain and snow the effect is within noise. The mean confidence of true positives changes by at most 0.012 in any stratum, so enhancement does not inflate confidence, and the trust layer, which reads quality features from the raw frame, is not misled by it. These are modest gains, consistent with the finding that restoration-oriented pre-processing helps recognition only partially~\cite{pei2018haze}.
+
+\begin{table}[t]
+\caption{Enhancement on minus off on identical frames (YOLO26m). Clear frames are untouched by design.}
+\label{tab:enh}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+Stratum & Recipe & $\Delta$mAP50 & $\Delta$Ped.\ rec. & $\Delta$Prec. & $\Delta$TP conf. \\
+\midrule
+BDD val night & gamma, CLAHE, bilateral & $-$0.007 & \textbf{+0.065} & $-$0.034 & $-$0.002 \\
+ACDC night & same & +0.011 & \textbf{+0.054} & +0.014 & +0.012 \\
+BDD val rain & CLAHE & $-$0.004 & +0.007 & 0.000 & +0.002 \\
+ACDC rain & CLAHE & $-$0.010 & +0.030 & +0.013 & $-$0.001 \\
+BDD val snow & gamma, CLAHE & $-$0.001 & 0.000 & +0.003 & +0.002 \\
+ACDC snow & gamma, CLAHE & 0.000 & +0.009 & +0.002 & +0.004 \\
+ACDC fog & per fog level & +0.007 & +0.015 & $-$0.008 & +0.002 \\
+Cityscapes fog light & CLAHE & +0.008 & +0.001 & $-$0.005 & +0.001 \\
+Cityscapes fog medium & dehaze, CLAHE & +0.020 & +0.020 & $-$0.009 & +0.001 \\
+Cityscapes fog dense & dehaze, CLAHE, denoise & +0.028 & \textbf{+0.042} & $-$0.021 & +0.001 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Weather Recognition}
+
+Table~\ref{tab:weather} summarises the weather classifier. It reaches 99.72\% on the ACDC test split and 96.4\% on held-out BDD100K, where the remaining errors stem largely from noisy tags (wet roads tagged rainy, snow on the ground tagged snowy). On real Foggy Cityscapes frames of unseen cities the fog level is exact in 97.85\% of frames and within one level in 99.9\%. Leave-one-camera-out accuracy is 93.9\%, which we regard as the realistic figure for a new camera. CLIP zero-shot~\cite{radford2021clip} is better only on DAWN's web imagery (82.7\% vs.\ 74.3\%), which resembles its pre-training data; on driving footage the trained model leads by 3--7 points and also provides the fog level.
+
+\begin{table}[t]
+\caption{Weather-condition accuracy on real test images.}
+\label{tab:weather}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Model & ACDC test & BDD100K test & DAWN (external) & Leave-one-camera-out \\
+\midrule
+CLIP zero-shot & 96.60\% & 89.03\% & \textbf{82.67\%} & -- \\
+DINOv2 last-2 & 99.68\% & 95.85\% & 67.47\% & 93.91\% \\
+ConvNeXt-T full & 99.08\% & 95.95\% & 72.73\% & 90.81\% \\
+Ensemble (ours) & \textbf{99.72\%} & \textbf{96.36\%} & 74.29\% & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Runtime}
+
+At 1280$\times$720 with all components enabled (weather every 5 frames, mirrored pass every 2 frames, DINOv2 distance on), the pipeline sustains 20.6 frames per second, with latency percentiles p50/p95/p99 of 47/71/81\,ms and a GPU memory peak of 439\,MB. Process memory grows by 0.5\,MB over 300 frames. A fast preset (without DINOv2 distance, mirrored pass for every 5 frames) reaches 34.8 frames per second (p95 54\,ms, 355\,MB). The ablation shows that the DINOv2 family contributes about 0.01 AUROC, so the fast preset trades little accuracy for a 70\% throughput increase.
+
+%% =====================================================================
+\section{Discussion and Limitations}\label{sec:discussion}
+%% =====================================================================
+
+\textbf{Gains are robust when pooled but uncertain on small strata.} Cluster bootstrapping shows that per-condition improvements on ACDC fog and rain and on several synthetic strata are not statistically significant. Benchmarks with few recordings per condition cannot support condition-level claims, and reporting point estimates alone would have overstated consistency. We recommend that failure-prediction work on adverse-weather data report sequence-level intervals.
+
+\textbf{Overfitting and training-set size.} The trust model attains AUROC 0.986 on its own training frames against 0.761 on held-out clear frames, which indicates substantial overfitting of the 400-tree model on 3,000 frames. Stronger regularisation, cross-validated hyperparameters and more clear-day training frames, which are cheap to obtain, are the most direct way to improve held-out performance, and we expect them to narrow this gap.
+
+\textbf{Baselines.} We compare against mean detection confidence, the standard black-box baseline. Methods that access detector internals, such as MetaDetect~\cite{schubert2021metadetect} and the feature-based monitor of Rahman et al.~\cite{rahman2021online}, or that require multiple passes, such as ensembles~\cite{lakshminarayanan2017ensembles}, are complementary and their comparison under the present protocol is left to future work.
+
+\textbf{Danger formulation.} The danger score is hand-designed and image-based. Proximity is approximated from box size and position, not metric depth, and no dataset provides near-miss labels against which danger could be validated externally. Our claims therefore concern the \emph{difference} between the same formula on detections and on annotations, which is independent of the formula's absolute validity, and the sensitivity analysis shows that this difference is robust to the weights.
+
+\textbf{Single frames and a single detector.} The benchmarks are single images, so temporal consistency, potentially a strong failure signal, is replaced by flip-consistency. The trust model is specific to the chosen detector and must be retrained for another one; its features, however, require only black-box access.
+
+\textbf{Calibration under shift.} Trust is a ranking that transfers, not a calibrated probability. Deployments that need probabilities should calibrate per condition, for example by using the weather classifier to select a calibration map fitted on a small annotated sample of each condition.
+
+%% =====================================================================
+\section{Conclusion}\label{sec:conclusion}
+%% =====================================================================
+
+We presented a perception readout that keeps two questions apart for every frame of monocular driving video: how far the detector can be trusted, and how dangerous the scene appears. A lightweight introspective model trained only on clear-day data predicts detector failure under unseen weather and cameras substantially better than detection confidence (pooled AUROC 0.739 vs.\ 0.610; E-AURC $-$34\%), although the improvement is not significant on every small cross-camera condition and its probabilities do not remain calibrated under shift. Danger computed from detections is underestimated in every condition, most at night and increasingly with fog density, and the low-trust, low-apparent-danger quadrant isolates the frames in which this underestimation is concentrated. The pipeline runs in real time on a laptop GPU. Future work will train trust directly on the danger-gap target, use temporal consistency on video benchmarks, regularise and enlarge the training set, and compare with white-box failure predictors.
+
+\backmatter
+
+\bmhead{Acknowledgements}
+%% TODO: acknowledge your supervisor/department/compute if appropriate.
+[To be completed.]
+
+\section*{Declarations}
+
+\textbf{Author contributions} %% TODO: confirm with co-authors (CRediT roles).
+S. Arsalan: Conceptualization, Methodology, Software, Investigation, Writing -- original draft. [Supervisor]: Supervision, Writing -- review \& editing.
+
+\textbf{Funding} The authors received no specific funding for this work. %% TODO: confirm.
+
+\textbf{Data availability} All datasets used (BDD100K, ACDC, Cityscapes, Foggy Cityscapes, DAWN) are publicly available from their providers. Per-frame trust and danger scores and all analysis scripts are available from the corresponding author and will be released upon acceptance.
+
+\textbf{Conflicts of interest} The authors declare that they have no conflict of interest.
+
+\bibliography{references}
+
+\end{document}
