@@ -122,7 +122,7 @@ def main(argv=None) -> None:
     # ---------- 1. AUROC with cluster-bootstrap CIs ----------
     rows = []
     sets = [(s, held[held["stratum"] == s]) for s in held["stratum"].unique()]
-    sets += [("POOLED held-out (all 21)", held), ("POOLED real adverse (12)", real_adverse)]
+    sets += [("POOLED held-out (all 21)", held), ("POOLED real adverse (10)", real_adverse)]
     for name, d in sets:
         point = auroc_stats(d)
         bs = cluster_boot(d, auroc_stats, a.boot, rng)
